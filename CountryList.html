@@ -95,7 +95,7 @@ class Resources{
 
 //creates data objects that the program will refer to to get the date regarding country of origin, country borders etc.
 var data = new Resources();
-document.getElementById("Start").innerHTML = countryDictionary[0];
+document.getElementById("Start").innerHTML = data.startCountry;
 
 function BFS(adjencencyList, start, destination, noVertices, previous, distance){
 	var queue = [];
