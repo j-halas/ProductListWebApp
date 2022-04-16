@@ -1,5 +1,5 @@
-# ProductListWebApp
-Web application that tells the user through which countries one has to travel to reach a North American Country chosen by the user
+# CountryListWebApp
+Web application using JavaScript embedded in HTML that tells the user through which countries one has to travel to reach a North American Country chosen by the user
 
 The app responds to three-letter codes for these North American countries:
 CAN - Canada
