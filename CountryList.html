@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Route plotting tool</title>
+	<style>
+		body{
+			margin:auto;
+			width: 50%;
+			height: 70%;
+			text-align: center;
+			padding: 70px 0;
+		}
+	</style>
+</head>
+<body>
+<p1>This tool will plot the international route from </p1>
+<x id="Start"></x>
+<p2>to other countries</p2>
+<br/>
+<p3>Please write the code for the destination country in the text box below:</p3>
+<br/>
+<input id="inputCountryText" type = "text"></input>
+<button type="button" onclick="ShowShortestPath()"> Plot route </button>
+<br/>
+<r id="results"></r>
+<r1 id="results1"></r1>
+<script>
+
+function Create2DArray(rows) {
+  var arr = [];
+
+  for (var i=0;i<rows;i++) {
+     arr[i] = [];
+  }
+
+  return arr;
+}
+
+
+function addEdge(adjencencyList,start,destination){
+	adjencencyList[start].push(destination);
+	adjencencyList[destination].push(start);
+}
+
+//all the data is stored below
+
+//this object matches up country names to its index number on the graph
+var countryDictionary = {
+	"USA":0,
+	"CAN":1,
+	"MEX":2,
+	"BLZ":3,
+	"GTM":4,
+	"SLV":5,
+	"HND":6,
+	"NIC":7,
+	"CRI":8,
+	"PAN":9
+}
+
+//the same thing as above but backwards - I know, not pretty
+var indexDictionary = {
+	0:"USA",
+	1:"CAN",
+	2:"MEX",
+	3:"BLZ",
+	4:"GTM",
+	5:"SLV",
+	6:"HND",
+	7:"NIC",
+	8:"CRI",
+	9:"PAN"
+}
+
+class Resources{
+	constructor(){
+	this.startCountry = "USA"; //make sure the country set here is in the graph
+	this.start = countryDictionary[this.startCountry];
+	this.noVertices = 10;
+	this.adjencencyList = Create2DArray(this.noVertices);
+	addEdge(this.adjencencyList,0,1);
+	addEdge(this.adjencencyList,0,2);
+	addEdge(this.adjencencyList,2,3);
+	addEdge(this.adjencencyList,2,4);
+	addEdge(this.adjencencyList,3,4);
+	addEdge(this.adjencencyList,4,5);
+	addEdge(this.adjencencyList,4,6);
+	addEdge(this.adjencencyList,6,7);
+	addEdge(this.adjencencyList,7,8);
+	addEdge(this.adjencencyList,8,9);
+	}
+}
+//data storage ends here
+
+//creates data objects that the program will refer to to get the date regarding country of origin, country borders etc.
+var data = new Resources();
+document.getElementById("Start").innerHTML = countryDictionary[0];
+
+function BFS(adjencencyList, start, destination, noVertices, previous, distance){
+	var queue = [];
+	var visited = [];
+	for(let i = 0; i < noVertices; i++){
+		visited[i] = false;
+		distance[i] = 10000;
+		previous[i] = -1;
+	}
+	visited[start] = true;
+	distance[start] = 0;
+	queue.push(start);
+	while(queue.length !== 0){
+		var u = queue[0];
+		for(let i = 0; i < adjencencyList[u].length; i++){
+			if(visited[adjencencyList[u][i]] === false){
+				visited[adjencencyList[u][i]] = true;
+				distance[adjencencyList[u][i]] = distance[u] + 1;
+				previous[adjencencyList[u][i]] = u;
+				queue.push(adjencencyList[u][i]);
+				
+				if(adjencencyList[u][i] === destination){
+					return true;
+				}
+			}
+		}
+		queue.shift();
+	}
+	return false;
+}
+
+const ShowShortestPath = () => {
+	let countryDestination = document.getElementById("inputCountryText").value;
+	var destination = countryDictionary[countryDestination];
+	if(destination === undefined){
+		alert("Provided country code is incorrect");
+		}
+	else {
+		var previous = [];
+		var distance = [];
+		for(let i = 0; i < data.noVertices; i++){
+			previous[i] = 0;
+			distance[i] = 0;
+			}
+		if(BFS(data.adjencencyList, data.start, destination, data.noVertices, previous, distance) === false){
+			alert("It's not possible to plot route to this country. Make sure you wrote the correct country code");
+			}
+		else {
+			var path = []
+			var crawl = destination;
+			path.push(crawl);
+			while (previous[crawl] !== -1){
+				path.push(previous[crawl]);
+				crawl = previous[crawl];
+		}
+		var finalResult = [];
+		for(let i = 0; i < path.length; i++){
+			finalResult[i] = (indexDictionary[path[path.length - i - 1]]);
+		}
+		document.getElementById("results").innerHTML = "The plotted route is: ";
+		document.getElementById("results1").innerHTML = finalResult.join(" => ");
+		//document.getElementById("results1").innerHTML = path.join(" => ");
+		}
+	}
+	
+}
+</script>
+</body>
+</html>
